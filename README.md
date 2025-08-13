@@ -1,0 +1,758 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Filosofía 2do - FTSP</title>
+    <style>
+        :root {
+            --primary: #3a506b;
+            --secondary: #5bc0be;
+            --accent: #f2b880;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: #2c3e50;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .day-header {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            font-size: 0.8rem;
+            padding: 4px 6px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+        }
+
+        .reading {
+            background-color: rgba(91, 192, 190, 0.1);
+        }
+
+        .reading::before {
+            background-color: var(--secondary);
+        }
+
+        .essay {
+            background-color: rgba(242, 184, 128, 0.1);
+        }
+
+        .essay::before {
+            background-color: var(--accent);
+        }
+
+        .homework {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+        .homework::before {
+            background-color: var(--success);
+        }
+
+        .exam {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .exam::before {
+            background-color: var(--danger);
+        }
+
+        .completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .current-day {
+            background-color: rgba(58, 80, 107, 0.1);
+            border: 2px solid var(--primary);
+        }
+
+        .other-month {
+            opacity: 0.4;
+        }
+
+        .task-form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .task-form-container h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .save-btn {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .no-tasks {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                gap: 5px;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+                font-size: 0.8rem;
+            }
+
+            .day-number {
+                font-size: 0.9rem;
+            }
+
+            .task-item {
+                font-size: 0.7rem;
+                padding: 2px 3px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="setup-instructions" style="background: #fff3cd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <h3>Para compartir este calendario:</h3>
+            <ol>
+                <li>Crea una cuenta en <a href="https://jsonbin.io" target="_blank">jsonbin.io</a></li>
+                <li>Crea un nuevo bin y copia el ID</li>
+                <li>Obtén tu API key</li>
+                <li>Reemplaza YOUR_BIN_ID y YOUR_API_KEY en el código</li>
+            </ol>
+        </div>
+        <header>
+            <h1 style="outline: rgb(0, 0, 0) dotted 3px; outline-offset: 1px;">Calendario de Tareas</h1>
+            <p>Calendario académico para Filosofía 2do - FTSP</p>
+        </header>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: var(--secondary);"></div>
+                <span>Lecturas</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: var(--accent);"></div>
+                <span>Ensayo</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: var(--success);"></div>
+                <span>Tarea</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: var(--danger);"></div>
+                <span>Examen</span>
+            </div>
+        </div>
+
+        <div class="calendar-navigation">
+            <button class="nav-btn" id="prev-month">&lt; Mes Anterior</button>
+            <div class="month-year" id="month-year">Mes Año</div>
+            <button class="nav-btn" id="next-month">Mes Siguiente &gt;</button>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+            <!-- Días de la semana -->
+            <div class="day-header">Lunes</div>
+            <div class="day-header">Martes</div>
+            <div class="day-header">Miércoles</div>
+            <div class="day-header">Jueves</div>
+            <div class="day-header">Viernes</div>
+            <div class="day-header">Sábado</div>
+            <div class="day-header">Domingo</div>
+
+            <!-- Días del calendario se generarán con JavaScript -->
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="pending-tasks">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completed-tasks">0</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="reading-tasks">0</div>
+                <div class="stat-label">Lecturas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="exam-tasks">0</div>
+                <div class="stat-label">Exámenes</div>
+            </div>
+        </div>
+
+        <div class="task-form-container" id="task-form-container">
+            <h2 id="form-title">Nueva Tarea</h2>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="task-title">Título</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-reminder">Recordatorio (minutos antes)</label>
+                    <input type="number" id="task-reminder" min="0" value="30">
+                </div>
+                <div class="form-group">
+                    <label for="task-subject">Materia</label>
+                    <input type="text" id="task-subject">
+                </div>
+                <div class="form-group">
+                    <label for="task-prof">Profesor</label>
+                    <input type="text" id="task-prof">
+                </div>
+                <div class="form-group">
+                    <label for="task-date">Fecha</label>
+                    <input type="date" id="task-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-type">Tipo</label>
+                    <select id="task-type" required>
+                        <option value="reading">Lectura</option>
+                        <option value="essay">Ensayo</option>
+                        <option value="homework">Tarea</option>
+                        <option value="exam">Examen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Prioridad</label>
+                    <select id="task-priority">
+                        <option value="low">Baja</option>
+                        <option value="medium" selected>Media</option>
+                        <option value="high">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-notes">Notas</label>
+                    <textarea id="task-notes"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="form-btn cancel-btn" id="cancel-btn">Cancelar</button>
+                    <button type="submit" class="form-btn save-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentDate = new Date();
+        let tasks = JSON.parse(localStorage.getItem('philosophy_tasks')) || [];
+        let editingTaskId = null;
+        let notificationPermission = false;
+
+        // Check/request notification permissions
+        function checkNotificationPermission() {
+            if (!('Notification' in window)) {
+                console.log('Notifications not supported');
+                return false;
+            }
+            
+            if (Notification.permission === 'granted') {
+                notificationPermission = true;
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    notificationPermission = permission === 'granted';
+                });
+            }
+            return notificationPermission;
+        }
+
+        // Schedule a reminder notification
+        function scheduleReminder(task) {
+            if (!task.reminderMinutes) return;
+            
+            const taskDate = new Date(task.date);
+            const reminderTime = taskDate.getTime() - (task.reminderMinutes * 60000);
+            const now = new Date().getTime();
+            
+            if (reminderTime > now) {
+                setTimeout(() => {
+                    if (notificationPermission) {
+                        new Notification(`Recordatorio: ${task.title}`, {
+                            body: `Materia: ${task.subject}\nProfesor: ${task.professor}`,
+                            icon: 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8df7b393-275e-43ca-81fc-db3b0ce69631.png'
+                        });
+                    }
+                }, reminderTime - now);
+            }
+        }
+
+        // Initialize notifications on page load
+        document.addEventListener('DOMContentLoaded', checkNotificationPermission);
+
+        // Elementos del DOM
+        const monthYearElement = document.getElementById('month-year');
+        const calendarGrid = document.getElementById('calendar-grid');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const taskFormContainer = document.getElementById('task-form-container');
+        const taskForm = document.getElementById('task-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const formTitle = document.getElementById('form-title');
+        
+        // Elementos de estadísticas
+        const pendingTasksElement = document.getElementById('pending-tasks');
+        const completedTasksElement = document.getElementById('completed-tasks');
+        const readingTasksElement = document.getElementById('reading-tasks');
+        const examTasksElement = document.getElementById('exam-tasks');
+
+        // Event Listeners
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            closeTaskForm();
+        });
+
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveTask();
+        });
+
+        // Función para renderizar el calendario
+        function renderCalendar() {
+            // Configurar el título del mes y año
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            monthYearElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            // Limpiar el calendario (excepto los encabezados de los días)
+            while (calendarGrid.children.length > 7) {
+                calendarGrid.removeChild(calendarGrid.lastChild);
+            }
+
+            // Obtener primer día del mes y último día del mes
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            
+            // Obtener el día de la semana del primer día (0-6, donde 0 es domingo)
+            const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            
+            // Obtener el día de la semana del último día
+            const endDay = lastDay.getDay() === 0 ? 6 : lastDay.getDay() - 1;
+            
+            // Agregar espacios en blanco para días del mes anterior
+            for (let i = 0; i < startDay; i++) {
+                const prevMonthDay = document.createElement('div');
+                prevMonthDay.className = 'calendar-day other-month';
+                const prevLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+                prevMonthDay.innerHTML = `<div class="day-number">${prevLastDay - (startDay - i - 1)}</div>`;
+                calendarGrid.appendChild(prevMonthDay);
+            }
+            
+            // Agregar días del mes actual
+            const today = new Date();
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // Marcar el día actual
+                if (i === today.getDate() && currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear()) {
+                    dayElement.classList.add('current-day');
+                }
+                
+                dayElement.innerHTML = `<div class="day-number">${i}</div>`;
+                
+                // Mostrar tareas para este día
+                const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+                const dayTasks = tasks.filter(task => {
+                    const taskDate = new Date(task.date);
+                    return taskDate.getDate() === dayDate.getDate() && 
+                           taskDate.getMonth() === dayDate.getMonth() && 
+                           taskDate.getFullYear() === dayDate.getFullYear();
+                });
+                
+                const taskList = document.createElement('ul');
+                taskList.className = 'task-list';
+                
+                if (dayTasks.length > 0) {
+                    dayTasks.forEach(task => {
+                        const taskItem = document.createElement('li');
+                        taskItem.className = `task-item ${task.type} ${task.completed ? 'completed' : ''}`;
+                        taskItem.textContent = task.title;
+                        taskItem.dataset.id = task.id;
+                        
+                        // Agregar evento para editar tarea
+                        taskItem.addEventListener('click', () => {
+                            openTaskForm(task.id);
+                        });
+                        
+                        taskList.appendChild(taskItem);
+                    });
+                } else {
+                    const noTasks = document.createElement('div');
+                    noTasks.className = 'no-tasks';
+                    noTasks.textContent = 'No hay tareas';
+                    taskList.appendChild(noTasks);
+                }
+                
+                // Agregar evento para nueva tarea
+                dayElement.addEventListener('dblclick', () => {
+                    const formattedDate = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`;
+                    document.getElementById('task-date').value = formattedDate;
+                    openTaskForm();
+                });
+                
+                dayElement.appendChild(taskList);
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Agregar espacios en blanco para días del próximo mes
+            for (let i = endDay + 1; i < 7; i++) {
+                const nextMonthDay = document.createElement('div');
+                nextMonthDay.className = 'calendar-day other-month';
+                nextMonthDay.innerHTML = `<div class="day-number">${i - endDay}</div>`;
+                calendarGrid.appendChild(nextMonthDay);
+            }
+            
+            // Actualizar estadísticas
+            updateStats();
+        }
+        
+        // Función para abrir el formulario de tarea
+        function openTaskForm(taskId = null) {
+            if (taskId) {
+                // Modo edición
+                editingTaskId = taskId;
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    formTitle.textContent = 'Editar Tarea';
+                    document.getElementById('task-id').value = task.id;
+                    document.getElementById('task-title').value = task.title;
+                    document.getElementById('task-date').value = task.date;
+                    document.getElementById('task-type').value = task.type;
+                    document.getElementById('task-priority').value = task.priority || 'medium';
+                    document.getElementById('task-notes').value = task.notes || '';
+                }
+            } else {
+                // Modo nueva tarea
+                formTitle.textContent = 'Nueva Tarea';
+                document.getElementById('task-form').reset();
+                editingTaskId = null;
+            }
+            
+            taskFormContainer.style.display = 'block';
+            document.getElementById('task-title').focus();
+        }
+        
+        // Función para cerrar el formulario de tarea
+        function closeTaskForm() {
+            taskFormContainer.style.display = 'none';
+            taskForm.reset();
+            editingTaskId = null;
+        }
+        
+        // Función para guardar la tarea
+        function saveTask() {
+            const title = document.getElementById('task-title').value.trim();
+            const date = document.getElementById('task-date').value;
+            const type = document.getElementById('task-type').value;
+            const priority = document.getElementById('task-priority').value;
+            const notes = document.getElementById('task-notes').value.trim();
+            const subject = document.getElementById('task-subject').value.trim();
+            const professor = document.getElementById('task-prof').value.trim();
+            
+            if (!title || !date || !type) {
+                alert('Por favor complete los campos requeridos');
+                return;
+            }
+            
+            if (editingTaskId) {
+                // Editar tarea existente
+                const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = {
+                        ...tasks[taskIndex],
+                        title,
+                        date,
+                        type,
+                        priority,
+                        notes,
+                        subject,
+                        professor,
+                        reminderMinutes: parseInt(document.getElementById('task-reminder').value) || 0
+                    };
+                    scheduleReminder(tasks[taskIndex]);
+                }
+            } else {
+                // Crear nueva tarea
+                const newTask = {
+                    id: Date.now().toString(),
+                    title,
+                    date,
+                    type,
+                    priority,
+                    notes,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                tasks.push(newTask);
+            }
+            
+            // Guardar usando API
+            try {
+              await fetch(`${API_URL}/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify({ tasks })
+              });
+              renderCalendar();
+              closeTaskForm();
+            } catch (error) {
+              console.error('Error saving tasks:', error);
+              alert('Error al guardar tareas');
+            }
+        }
+        
+        // Función para actualizar las estadísticas
+        function updateStats() {
+            const pendingTasks = tasks.filter(t => !t.completed).length;
+            const completedTasks = tasks.filter(t => t.completed).length;
+            const readingTasks = tasks.filter(t => t.type === 'reading').length;
+            const examTasks = tasks.filter(t => t.type === 'exam').length;
+            
+            pendingTasksElement.textContent = pendingTasks;
+            completedTasksElement.textContent = completedTasks;
+            readingTasksElement.textContent = readingTasks;
+            examTasksElement.textContent = examTasks;
+        }
+        
+        // Inicializar cargando tareas desde API
+        loadTasks();
+        checkNotificationPermission();
+    </script>
+</body>
+</html>
+
+```
